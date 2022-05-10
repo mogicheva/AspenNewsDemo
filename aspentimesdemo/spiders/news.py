@@ -41,13 +41,17 @@ class NewsLocalSpider(scrapy.Spider):
         item['date'] = str(date[0:10])
         item['title'] = response.xpath('//article/h1/text()').get()
         item['article'] = response.xpath("//div[contains(@class, 'p402_premium')]/p[contains(@class, 'oc-body')]/text()").getall()
-        item['author'] = response.xpath("//h6/a/text()").get()
+        author = response.xpath("//h6/a[contains(@rel, 'author')]/text()").get()
+        if author is not None:
+            item['author'] = author
+        else:
+            item['author'] = 'None'
         item['url'] = response.request.url
 
         yield {
+            'Author': item['author'],
             'Title': item['title'],
             'Article': item['article'],
-            'Author': item['author'],
             'URL': item['url'],
             'Date': item['date']
         }
